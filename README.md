@@ -1,3 +1,8 @@
+# Vibe Coding with Cursor Course
+
+![image](https://github.com/user-attachments/assets/f889e3ef-deea-4790-85a2-a55c22c08899)
+
+
 # Setup Guide (10min)
 
 ## Project Setup
