@@ -23,7 +23,7 @@ git clone HTTPS_URL
 - In the root directory, rename `.env.example` and rename as `.env` 
 
 2. Get your OPENAI_API_KEY
-- Populate 
+- Populate `supabase/functions/.env`
 
 
 3. Setup Task Master in MCP settings [Task Master AI](https://github.com/eyaltoledano/claude-task-master?tab=readme-ov-file)
