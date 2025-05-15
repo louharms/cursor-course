@@ -1,6 +1,10 @@
 # Vibe Coding with Cursor Course
 
+## Demo
 ![image](https://github.com/user-attachments/assets/f889e3ef-deea-4790-85a2-a55c22c08899)
+
+## Vibe Coding Workflow
+![image](https://github.com/user-attachments/assets/6120ecb6-5be2-4bcb-9b63-7389051621fd)
 
 
 # Setup Guide (10min)
