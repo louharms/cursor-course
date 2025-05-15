@@ -1,4 +1,5 @@
 # Vibe Coding with Cursor Course
+Shawn was here.
 
 ## Demo
 ![image](https://github.com/user-attachments/assets/f889e3ef-deea-4790-85a2-a55c22c08899)
