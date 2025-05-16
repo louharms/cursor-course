@@ -1,0 +1,14 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+PLANNING SEQUENCE:
+1. Start with # [PLANNING] or I might mention that I'm confirming the tradeoffs with one of the optoins.
+2. Restate the requirements in full and make a high level plan of attack, organized by a logical sequence of changes: Frontend / Backend / Database
+3. Documentation Request: Don't use your knowledge base to code. If there are any docs you'd like to see from NextJS, Supabase. E.g., I'd like to see X documentation from NextJS.
+4. Make sure to mention what to check at each step, we never want to edit more than 1 file per phase without checking.
+5. When I provide docs, you should analyze  and summarize them BEFORE starting. You should be verbose in this learning phase so we understand if it changes our previous tradeoffs/planning phases. 
+
+For supabase, use `npx supabase`
+For general commands, use [README.md](mdc:README.md)
