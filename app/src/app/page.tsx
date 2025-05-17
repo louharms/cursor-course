@@ -66,43 +66,42 @@ export default function ChatDemoPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Simulate AI response
-  const getAIResponse = (
+  // Get AI response for image generation only
+  const getAIResponse = async (
     userInput: string,
     isImage: boolean
   ): Promise<string> => {
-    return new Promise((resolve) => {
-      // Simulate network delay
-      setTimeout(() => {
-        if (isImage) {
-          resolve(`Here's an AI-generated image based on: "${userInput}"`);
-        } else {
-          // Simple response logic
-          if (userInput.toLowerCase().includes("weather")) {
-            resolve(
-              "I don't have access to real-time weather data, but you can check a weather service like weather.com for current conditions."
-            );
-          } else if (
-            userInput.toLowerCase().includes("hello") ||
-            userInput.toLowerCase().includes("hi")
-          ) {
-            resolve("Hello there! How can I assist you today?");
-          } else if (userInput.toLowerCase().includes("help")) {
-            resolve(
-              "I can help answer questions, provide information, or generate images in image mode. What would you like to know?"
-            );
-          } else if (userInput.toLowerCase().includes("image")) {
-            resolve(
-              "To create an image, click the 'Create image' button on the left of the input field, then describe the image you'd like me to generate."
-            );
-          } else {
-            resolve(
-              `I received your message: "${userInput}". How can I help you further with this?`
-            );
-          }
+    try {
+      if (!isImage) {
+        throw new Error(
+          "This function should only be used for image generation"
+        );
+      }
+
+      // Call image generation edge function
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/image-generation`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_ANON_KEY}`,
+          },
+          body: JSON.stringify({ prompt: userInput }),
         }
-      }, 1000); // 1 second delay to simulate thinking/processing
-    });
+      );
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      return `Here's an AI-generated image: ${data.imageUrl}`;
+    } catch (error) {
+      console.error("Error getting AI response:", error);
+      return "Sorry, I encountered an error processing your image request. Please try again.";
+    }
   };
 
   // Handle sending a new message
@@ -129,21 +128,127 @@ export default function ChatDemoPage() {
     // Clear input field
     setInput("");
 
-    // Get AI response
     try {
-      const responseContent = await getAIResponse(input, isImageMode);
+      if (isImageMode) {
+        // Handle image generation (non-streaming)
+        const responseContent = await getAIResponse(input, isImageMode);
 
-      // Add assistant response
-      const assistantMessage: Message = {
-        id: newId + 1,
-        role: "assistant",
-        content: responseContent,
-        type: isImageMode ? "image" : "text",
-      };
+        // Add assistant response
+        const assistantMessage: Message = {
+          id: newId + 1,
+          role: "assistant",
+          content: responseContent,
+          type: "image",
+        };
 
-      setMessages((prev) => [...prev, assistantMessage]);
+        setMessages((prev) => [...prev, assistantMessage]);
+      } else {
+        // For text chat, immediately add an empty assistant message that we'll fill incrementally
+        const assistantMessage: Message = {
+          id: newId + 1,
+          role: "assistant",
+          content: "",
+          type: "text",
+        };
+
+        setMessages((prev) => [...prev, assistantMessage]);
+
+        // Call chat completion edge function directly here for streaming updates
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/chat-completion`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${process.env.NEXT_PUBLIC_ANON_KEY}`,
+              },
+              body: JSON.stringify({
+                messages: [{ role: "user", content: input }],
+              }),
+            }
+          );
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Failed to get response");
+          }
+
+          // Process the streaming response
+          const reader = response.body?.getReader();
+          if (!reader) {
+            throw new Error("Failed to get response stream");
+          }
+
+          const decoder = new TextDecoder();
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value);
+            // Process each event in the chunk
+            for (const line of chunk.split("\n")) {
+              if (line.startsWith("data: ")) {
+                if (line === "data: [DONE]") {
+                  continue;
+                }
+
+                try {
+                  const data = JSON.parse(line.substring(6));
+                  if (data.content) {
+                    // Update the assistant message with each new token
+                    setMessages((prevMessages) => {
+                      const updatedMessages = [...prevMessages];
+                      const lastMessageIndex = updatedMessages.length - 1;
+
+                      if (
+                        lastMessageIndex >= 0 &&
+                        updatedMessages[lastMessageIndex].role === "assistant"
+                      ) {
+                        updatedMessages[lastMessageIndex] = {
+                          ...updatedMessages[lastMessageIndex],
+                          content:
+                            updatedMessages[lastMessageIndex].content +
+                            data.content,
+                        };
+                      }
+
+                      return updatedMessages;
+                    });
+                  }
+                } catch (e) {
+                  // Skip parse errors for incomplete chunks
+                  console.warn("Failed to parse SSE chunk", e);
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Streaming error:", error);
+          // Update the last message with error information
+          setMessages((prevMessages) => {
+            const updatedMessages = [...prevMessages];
+            const lastMessageIndex = updatedMessages.length - 1;
+
+            if (
+              lastMessageIndex >= 0 &&
+              updatedMessages[lastMessageIndex].role === "assistant"
+            ) {
+              updatedMessages[lastMessageIndex] = {
+                ...updatedMessages[lastMessageIndex],
+                content:
+                  "Sorry, I encountered an error processing your request. Please try again.",
+              };
+            }
+
+            return updatedMessages;
+          });
+        }
+      }
     } catch (error) {
-      // Handle error
+      console.error("Error in message handling:", error);
+      // Add error message
       const errorMessage: Message = {
         id: newId + 1,
         role: "assistant",
@@ -199,11 +304,34 @@ export default function ChatDemoPage() {
                       : "bg-gray-200 text-gray-800"
                   }`}
                 >
-                  {message.content}
-                  {message.type === "image" && message.role === "assistant" && (
-                    <div className="mt-2 p-2 bg-gray-100 rounded text-sm text-gray-500">
-                      [Image would be displayed here in a real implementation]
+                  {message.type === "image" && message.role === "assistant" ? (
+                    <div>
+                      <p className="mb-2">
+                        {
+                          message.content.split(
+                            "Here's an AI-generated image:"
+                          )[0]
+                        }
+                      </p>
+                      {message.content.includes("AI-generated image:") && (
+                        <div className="mt-2">
+                          <img
+                            src={message.content
+                              .split("Here's an AI-generated image:")[1]
+                              ?.trim()}
+                            alt="AI generated image"
+                            className="rounded-md max-w-full"
+                            onError={(e) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src =
+                                "https://via.placeholder.com/300x200?text=Image+Load+Error";
+                            }}
+                          />
+                        </div>
+                      )}
                     </div>
+                  ) : (
+                    message.content
                   )}
                 </div>
               </div>
