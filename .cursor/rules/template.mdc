@@ -1,0 +1,19 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+[CURRENT STATE]
+- Summary chat/PRs
+- What we're doing next
+- Cursor Rules to use
+
+[CONTEXT]
+- Docs 
+- PRD @prd.txt 
+
+[COMMANDS]
+- Frontend/backend
+
+[TESTING]
+- How to manually verify the outputs
