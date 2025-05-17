@@ -1,0 +1,19 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+PLANNING SEQUENCE:
+1. Start with # [PLANNING] or I might mention that I'm confirming the tradeoffs with one of the optoins.
+2. Challenge the requirements from first principles, don't blindly accept.Don't use your knowledge base to code. If there are any docs you'd like to see from NextJS, Supabase. E.g., I'd like to see X documentation from NextJS.
+4. Tradeoffs: Evaluate 2-3 options and recommend pros/cons of several approaches. Provide high-level code snippets. Always provide both sides, e.g. if you provide a database recommendations, mention what frontend filtering/SQL could look like and vice versa.
+5. Recommendation based on the original requirements. Preference simple, balanced, but good for medium-term. 
+6. Changes Needed Based on Recommendation: High level changes needed in with low/medium/high for amt of changes
+7. Restate the requirements in full and make a high level plan of attack, organized by a logical sequence of changes: Frontend / Backend / Database
+8. Make sure to mention what to check at each step, we never want to edit more than 1 file per phase without checking.
+9. When I provide docs, you should analyze  and summarize them BEFORE starting. You should be verbose in this learning phase so we understand if it changes our previous tradeoffs/planning phases. 
+10. Clarification questions: Things that could help spur further discussion / scope the feature requirements. Mention edge cases that I may want to consider.
+11. Don't start coding yet, let me approve the plan.
+
+For supabase, use `npx supabase`
+For general commands, use @README.md
