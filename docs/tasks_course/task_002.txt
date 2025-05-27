@@ -1,0 +1,11 @@
+# Task ID: 2
+# Title: Supabase Setup and Database Schema
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Set up a local Supabase instance and create the database schema for chat sessions and messages.
+# Details:
+Install Supabase CLI and initialize a local Supabase instance. Create SQL migrations for the chat_sessions and chat_messages tables according to the data models specified in the PRD. The chat_sessions table should include id, created_at, updated_at, and title fields. The chat_messages table should include id, created_at, chat_id, role, content, type, and optional image_url fields. Set up foreign key relationships between tables. Configure Supabase client in the NextJS application.
+
+# Test Strategy:
+Run migrations and verify tables are created correctly. Test basic CRUD operations on both tables using the Supabase client. Ensure foreign key constraints are working properly.

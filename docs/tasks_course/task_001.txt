@@ -1,0 +1,49 @@
+# Task ID: 1
+# Title: Project Setup and Configuration
+# Status: done
+# Dependencies: None
+# Priority: high
+# Description: Initialize the NextJS project with App Directory structure and configure essential dependencies including TailwindCSS and ShadUI.
+# Details:
+Create a new NextJS project using 'create-next-app' with the App Directory flag. Install and configure TailwindCSS following the official documentation. Add ShadUI components library. Set up environment variables for API keys. Create the basic folder structure following NextJS conventions with app directory, components, lib, and utils folders. Initialize Git repository with appropriate .gitignore file.
+
+# Test Strategy:
+Verify that the development server starts without errors. Confirm that TailwindCSS styles are working by testing a simple component. Ensure ShadUI components can be imported and rendered correctly.
+
+# Subtasks:
+## 1. Initialize NextJS Project with App Directory [done]
+### Dependencies: None
+### Description: Create a new NextJS project using the create-next-app command with the App Directory structure enabled
+### Details:
+Run 'npx create-next-app@latest my-project --typescript --eslint --app' to create a new project with TypeScript and ESLint support. Verify the app directory structure is created correctly. Initialize a Git repository with 'git init' and create an appropriate .gitignore file that includes node_modules, .next, and environment files.
+
+## 2. Install and Configure TailwindCSS [done]
+### Dependencies: 1.1
+### Description: Add TailwindCSS to the project and set up the necessary configuration files
+### Details:
+Install TailwindCSS and its dependencies with 'npm install -D tailwindcss postcss autoprefixer'. Initialize Tailwind with 'npx tailwindcss init -p' to create tailwind.config.js and postcss.config.js. Configure content paths in tailwind.config.js to include all relevant files. Add the Tailwind directives (@tailwind base, components, utilities) to the global CSS file.
+
+## 3. Add ShadUI Components Library [done]
+### Dependencies: 1.2
+### Description: Install and configure ShadUI components library for the project
+### Details:
+Install ShadUI with 'npm install @shadcn/ui'. Run the ShadUI CLI with 'npx shadcn-ui@latest init' to set up the configuration. Choose the appropriate styling options when prompted. Add the necessary ShadUI component styles to the tailwind.config.js file. Create a components.json file for ShadUI configuration.
+
+## 4. Create Project Folder Structure [done]
+### Dependencies: 1.1
+### Description: Set up the recommended folder structure for the NextJS app directory approach
+### Details:
+Create the following directories: app/ (for pages and layouts), components/ (for reusable UI components), lib/ (for third-party library configurations), and utils/ (for utility functions). Within the app directory, create page.tsx as the home page, layout.tsx for the root layout, and a basic error.tsx. Add placeholder files in each directory to maintain the structure in Git.
+
+## 5. Configure Environment Variables [done]
+### Dependencies: 1.1
+### Description: Set up environment variables handling for development and production
+### Details:
+Create a .env.local file for local development variables. Create a .env.example file with placeholder values as documentation. Add environment variable validation using zod or a similar library in a utils/env.ts file. Update .gitignore to exclude .env.local and other environment-specific files. Document the required environment variables in the README.md file.
+
+## 6. Add and Render ShadUI Components [done]
+### Dependencies: 1.3
+### Description: Add specific ShadUI components to the project and render them in the application
+### Details:
+Use the ShadUI CLI to add specific components needed for the application (e.g., 'npx shadcn-ui@latest add button'). Create example implementations of these components in the application to demonstrate their usage. Ensure the components are properly styled and functioning according to the ShadUI documentation.
+

@@ -1,0 +1,11 @@
+# Task ID: 8
+# Title: Mode Toggle Implementation
+# Status: pending
+# Dependencies: 6, 7
+# Priority: medium
+# Description: Create functionality to switch between text chat and image generation modes.
+# Details:
+Implement a toggle component to switch between text and image modes. Update the chat context to track the current mode. Modify the message submission flow to handle different modes. Update the UI to provide clear visual indication of the active mode. Ensure smooth transitions between modes. Adjust the input placeholder text based on the active mode.
+
+# Test Strategy:
+Test switching between modes and verify that the UI updates accordingly. Confirm that the correct API endpoints are called based on the selected mode. Verify that the mode state persists correctly during a session.

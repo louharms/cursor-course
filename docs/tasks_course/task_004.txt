@@ -1,0 +1,11 @@
+# Task ID: 4
+# Title: Supabase Edge Functions Implementation
+# Status: pending
+# Dependencies: 2
+# Priority: medium
+# Description: Create Supabase Edge Functions to handle chat logic and OpenAI API interactions.
+# Details:
+Develop Supabase Edge Functions for: 1) Creating new chat sessions, 2) Sending messages to OpenAI and storing responses, 3) Retrieving chat history, and 4) Generating images with OpenAI. Implement proper error handling and rate limit management. Set up the functions to use environment variables for API keys. Create TypeScript interfaces for request and response types. Follow the Supabase_EdgeFunctions.md documentation for implementation details.
+
+# Test Strategy:
+Test each function individually using the Supabase CLI. Verify correct handling of various input scenarios including edge cases. Confirm that API responses are properly processed and returned.

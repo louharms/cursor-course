@@ -1,0 +1,11 @@
+# Task ID: 3
+# Title: Basic UI Layout and Components
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Create the foundational UI components and layout for the chat interface.
+# Details:
+Design and implement the main layout component with header, chat area, and input section. Create reusable components for chat messages (both user and AI), message input, send button, and new chat button. Implement responsive design using TailwindCSS to ensure the application works well on different screen sizes. Use ShadUI for consistent styling of buttons, inputs, and other interactive elements. Create placeholder components for the mode toggle (text/image).
+
+# Test Strategy:
+Visually inspect the UI in different viewport sizes to verify responsiveness. Ensure components render correctly and match the design requirements. Test keyboard navigation and basic accessibility.

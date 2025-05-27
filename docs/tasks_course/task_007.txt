@@ -1,0 +1,11 @@
+# Task ID: 7
+# Title: Image Generation Mode Implementation
+# Status: pending
+# Dependencies: 5
+# Priority: medium
+# Description: Add image generation capability using OpenAI's gpt-image-1 model.
+# Details:
+Implement the image generation service using OpenAI's gpt-image-1 model. Create UI components for displaying generated images. Modify the message input to handle image prompts. Implement image storage and retrieval using Supabase storage. Update the chat message component to display images. Follow the OpenAI_ImageGeneration.md documentation for implementation details.
+
+# Test Strategy:
+Test image generation with various prompts. Verify that generated images are displayed correctly and stored in Supabase. Check that the UI handles image loading states appropriately.
