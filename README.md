@@ -1,5 +1,8 @@
 # Vibe Coding with Cursor Course
-Shawn was here.
+
+## Udemy Course
+Use Cursor to Vibe Code Full Stack Apps (MCP, NextJS, Supabase)
+[Course + Discount Code](https://www.udemy.com/course/cursor-ai-mcp-nextjs-supabase/?couponCode=VIBE-CODE)
 
 ## Demo
 ![image](https://github.com/user-attachments/assets/f889e3ef-deea-4790-85a2-a55c22c08899)
