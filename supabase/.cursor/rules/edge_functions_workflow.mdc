@@ -109,4 +109,14 @@ Upgrade the affected packages package in `import_map.json`
 From the frontend, it cannot find the function.
 
 ### Solution:
+Reserve the functiosn
 Create a new function using `npx supabase functions new FUNCTION_NAME` and re-serve it.
+
+# How to Import Packages
+[import_map.json](mdc:supabase/functions/import_map.json) contains the libraries used, just use 
+
+GOOD: import OpenAI from "openai";
+BAD: import OpenAI from "https://deno.land/x/openai@v4.24.0/mod.ts";
+
+## Best Practices
+- Don't use `serve`, use Deno.serve - don't worry about the Typescript error.

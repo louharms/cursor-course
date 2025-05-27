@@ -1,0 +1,259 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Next.js Security Audit Checklist
+
+---
+description: Security audit checklist for Next.js applications based on web security best practices
+globs: app/**/*.{js,ts,jsx,tsx}, src/**/*.{js,ts,jsx,tsx}, pages/**/*.{js,ts,jsx,tsx}
+alwaysApply: true
+---
+
+## Frontend Security
+
+### HTTPS Implementation
+
+- [ ] **HTTPS Everywhere**
+  - [ ] Verify all API endpoints use HTTPS
+  - [ ] Check for mixed content warnings
+  - [ ] Ensure HSTS is properly implemented
+  - [ ] Verify all cookies have secure flags
+
+### Input Validation and Sanitization (XSS Prevention)
+
+- [ ] **Form Inputs**
+  - [ ] Validate all user input on both client and server
+  - [ ] Use appropriate React patterns to prevent direct HTML insertion
+  - [ ] Avoid using `dangerouslySetInnerHTML` without sanitization
+  - [ ] Check dynamic CSS for injection vulnerabilities
+
+- [ ] **URL Parameters**
+  - [ ] Validate and sanitize all URL parameters
+  - [ ] Prevent reflected XSS via URL parameters
+  - [ ] Sanitize dynamic content rendering based on URL input
+
+### Client-side Data Storage
+
+- [ ] **Browser Storage**
+  - [ ] No secrets in localStorage or sessionStorage
+  - [ ] No sensitive user data stored client-side
+  - [ ] Check for hardcoded credentials
+  - [ ] Review cookie usage for sensitive data
+
+### CSRF Protection
+
+- [ ] **Form Submissions**
+  - [ ] Include anti-CSRF tokens for all state-changing operations
+  - [ ] Verify forms use appropriate auth headers
+  - [ ] Check POST/PUT/DELETE requests for CSRF protection
+
+- [ ] **Cookie Configuration**
+  - [ ] Set appropriate SameSite cookie policy
+  - [ ] Use HttpOnly for sensitive cookies
+  - [ ] Implement proper cookie expiration
+
+### API Security
+
+- [ ] **API Keys and Credentials**
+  - [ ] No exposed API keys in frontend code
+  - [ ] Server-side API requests for protected operations
+  - [ ] Environment variables properly configured
+  - [ ] API route handlers implement proper authentication
+
+## Backend Security (Next.js API Routes)
+
+### Authentication
+
+- [ ] **Auth Implementation**
+  - [ ] Auth libraries used correctly (Auth.js, NextAuth.js, etc.)
+  - [ ] JWT tokens validated properly
+  - [ ] Secure password storage (if applicable)
+  - [ ] MFA implementation (if applicable)
+
+### Authorization
+
+- [ ] **Permission Checks**
+  - [ ] API routes verify user permissions
+  - [ ] Protected routes check authentication
+  - [ ] Role-based access control implemented
+  - [ ] No information leakage in unauthenticated responses
+
+### API Endpoint Protection
+
+- [ ] **API Routes**
+  - [ ] All API routes require proper authentication
+  - [ ] CORS configured correctly
+  - [ ] Proper HTTP methods enforced
+  - [ ] Request validation on all input
+
+### Database Query Security
+
+- [ ] **Query Construction**
+  - [ ] ORM/query builder used to prevent SQL injection
+  - [ ] No raw SQL with user input
+  - [ ] Parameterized queries for direct database access
+  - [ ] Proper input sanitization before querying
+
+### Security Headers
+
+- [ ] **Response Headers**
+  - [ ] Content-Security-Policy implemented
+  - [ ] X-Frame-Options configured
+  - [ ] X-Content-Type-Options: nosniff set
+  - [ ] Referrer-Policy configured properly
+
+## Practical Security Measures
+
+### Dependency Management
+
+- [ ] **NPM Packages**
+  - [ ] Regular security audits (`npm audit`)
+  - [ ] No known vulnerable dependencies
+  - [ ] Package lock files committed to repository
+  - [ ] Dependency auto-updates configured (Dependabot, etc.)
+
+### Error Handling
+
+- [ ] **Error Management**
+  - [ ] No sensitive details in error messages
+  - [ ] Client-side errors sanitized
+  - [ ] Server-side errors logged but not exposed
+  - [ ] Custom error pages configured
+
+### File Upload Security
+
+- [ ] **Upload Handlers**
+  - [ ] File type validation for uploads
+  - [ ] File size limits implemented
+  - [ ] Uploads stored securely (not in public directory)
+  - [ ] Malware scanning (if applicable)
+
+### Rate Limiting
+
+- [ ] **Request Throttling**
+  - [ ] Authentication endpoints rate-limited
+  - [ ] API routes protected against brute force
+  - [ ] User-specific rate limits configured
+  - [ ] Appropriate timeout/retry mechanisms
+
+## Implementation Guide
+
+### HTTPS Setup
+
+```typescript
+// In next.config.js ensure redirects to HTTPS
+module.exports = {
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY'
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block'
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### Input Validation Example
+
+```typescript
+// Validate form input
+import z from 'zod';
+
+// Define schema
+const userSchema = z.object({
+  username: z.string().min(3).max(20),
+  email: z.string().email(),
+  age: z.number().int().positive().optional(),
+});
+
+// Usage in API route
+export default async function handler(req, res) {
+  try {
+    const validatedData = userSchema.parse(req.body);
+    // Process valid data...
+  } catch (error) {
+    return res.status(400).json({ error: error.errors });
+  }
+}
+```
+
+### Authentication Check Example
+
+```typescript
+// In API route
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+
+export async function POST(req) {
+  const session = await getServerSession(authOptions);
+  
+  if (!session) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+  
+  // Continue with authenticated request...
+}
+```
+
+### Rate Limiting Example
+
+```typescript
+// In API route using middleware
+import rateLimit from 'express-rate-limit';
+import { createMiddleware } from '@/lib/middleware';
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+export default async function handler(req, res) {
+  await createMiddleware(req, res, limiter);
+  
+  // Continue with rate-limited request...
+}
+```
+
+## Security Audit Process
+
+1. Run automated scans:
+   - Use `npm audit` for dependency vulnerabilities
+   - Configure security linting rules (ESLint security plugins)
+   - Perform regular OWASP ZAP or similar scans
+
+2. Conduct manual review:
+   - Review all API routes for proper auth checks
+   - Check frontend components for XSS vulnerabilities
+   - Inspect client-side storage usage
+   - Review cookie and session management
+
+3. Document findings:
+   - Maintain a security issues backlog
+   - Prioritize based on risk (Critical, High, Medium, Low)
+   - Set remediation timelines
+   - Schedule regular re-testing

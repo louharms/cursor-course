@@ -1,0 +1,4 @@
+https://docs.cursor.com/context/ignore-files#default-ignore-list
+.env
+!package-lock.json
+docs/tasks_course

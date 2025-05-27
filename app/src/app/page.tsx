@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, KeyboardEvent, useRef } from "react";
+import DOMPurify from "dompurify";
 import {
   getConversations,
   createConversation,
@@ -177,6 +178,9 @@ export default function ChatDemoPage() {
 
     setIsLoading(true);
 
+    // Sanitize input before using
+    const sanitizedInput = DOMPurify.sanitize(input);
+
     // Generate a new ID for UI
     const newId =
       messages.length > 0 ? Math.max(...messages.map((m) => m.id)) + 1 : 1;
@@ -185,7 +189,7 @@ export default function ChatDemoPage() {
     const userMessage: Message = {
       id: newId,
       role: "user",
-      content: input,
+      content: sanitizedInput,
       type: isImageMode ? "image" : "text",
     };
 
@@ -197,7 +201,7 @@ export default function ChatDemoPage() {
       await createMessage({
         conversation_id: currentConversation.id,
         role: "user",
-        content: input,
+        content: sanitizedInput,
         type: isImageMode ? "image" : "text",
       });
 
@@ -206,7 +210,10 @@ export default function ChatDemoPage() {
 
       if (isImageMode) {
         // Handle image generation (non-streaming)
-        const responseContent = await getAIResponse(input, isImageMode);
+        const responseContent = await getAIResponse(
+          sanitizedInput,
+          isImageMode
+        );
 
         // Add assistant response to UI
         const assistantMessage: Message = {
@@ -247,7 +254,7 @@ export default function ChatDemoPage() {
                 Authorization: `Bearer ${process.env.NEXT_PUBLIC_ANON_KEY}`,
               },
               body: JSON.stringify({
-                messages: [{ role: "user", content: input }],
+                messages: [{ role: "user", content: sanitizedInput }],
               }),
             }
           );
@@ -534,7 +541,11 @@ export default function ChatDemoPage() {
                         )}
                       </div>
                     ) : (
-                      message.content
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: DOMPurify.sanitize(message.content),
+                        }}
+                      />
                     )}
                   </div>
                 </div>

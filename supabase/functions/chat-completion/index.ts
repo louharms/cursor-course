@@ -28,6 +28,19 @@ Deno.serve(async (req: Request) => {
     // Parse the request body
     const { messages } = await req.json();
 
+    // Validate message format
+    if (
+      !Array.isArray(messages) ||
+      !messages.every(
+        (m) =>
+          typeof m === "object" &&
+          (m.role === "user" || m.role === "assistant") &&
+          typeof m.content === "string"
+      )
+    ) {
+      throw new Error("Invalid message format");
+    }
+
     // Get API key from environment variables
     const apiKey = Deno.env.get("OPENAI_API_KEY");
     if (!apiKey) {

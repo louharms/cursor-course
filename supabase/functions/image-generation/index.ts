@@ -32,6 +32,10 @@ Deno.serve(async (req: Request) => {
       throw new Error("Missing or invalid prompt parameter");
     }
 
+    if (prompt.trim().length > 4000) {
+      throw new Error("Prompt is too long (maximum 4000 characters)");
+    }
+
     // Get API key from environment variables
     const apiKey = Deno.env.get("OPENAI_API_KEY");
     if (!apiKey) {
