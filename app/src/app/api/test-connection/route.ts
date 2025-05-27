@@ -1,32 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  testSupabaseConnection,
-  initializeHealthCheck,
-} from "@/lib/supabase-utils";
 
 export async function GET(request: NextRequest) {
   try {
-    // Check if we need to initialize health check
+    // Example API route template
     const searchParams = request.nextUrl.searchParams;
-    const initialize = searchParams.get("initialize") === "true";
+    const param = searchParams.get("param");
 
-    // Test the connection
-    const connectionResult = await testSupabaseConnection();
+    // Your logic here
+    const data = {
+      message: "Test connection API endpoint",
+      timestamp: new Date().toISOString(),
+      param: param || null,
+    };
 
-    // If connection successful and initialize flag is set, also initialize health check
-    if (connectionResult.success && initialize) {
-      const healthCheckResult = await initializeHealthCheck();
-      return NextResponse.json({
-        ...connectionResult,
-        healthCheck: healthCheckResult,
-      });
-    }
-
-    return NextResponse.json(connectionResult);
+    return NextResponse.json(data);
   } catch (error) {
     console.error("API route error:", error);
     return NextResponse.json(
-      { error: "Failed to test connection", details: String(error) },
+      { error: "Internal server error", details: String(error) },
       { status: 500 }
     );
   }
