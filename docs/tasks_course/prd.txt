@@ -1,0 +1,195 @@
+# GPT-Powered Chatbot with Image Generation PRD
+
+## Overview
+This product is a web-based GPT-powered chatbot that allows users to interact with OpenAI's language models for text conversations and image generation. The application enables seamless switching between text chat and image generation modes, providing a versatile AI interaction experience. It serves anyone wanting to chat with large language models or generate AI images through a simple, intuitive interface without requiring technical knowledge.
+
+## Core Features
+
+### 1. Text-based Chat Interface
+- **What**: A clean, message-based interface displaying user inputs and AI responses
+- **Why**: Enables natural conversation flow between users and the AI
+- **How**: Uses OpenAI's GPT-4.1-nano model with streaming responses to provide real-time feedback
+
+### 2. Text Streaming
+- **What**: Real-time display of AI responses as they're generated
+- **Why**: Creates a more engaging and immediate user experience
+- **How**: Implements OpenAI's streaming API with NextJS server components and React to render incoming tokens
+
+### 3. Image Generation Toggle
+- **What**: Ability to switch between text chat and image generation modes
+- **Why**: Allows users to leverage both text and image generation capabilities in a single interface
+- **How**: Uses OpenAI's gpt-image-1 model with a UI toggle to switch modes
+
+### 4. New Chat Functionality
+- **What**: Option to start a fresh conversation
+- **Why**: Lets users begin new topics without history influencing AI responses
+- **How**: Clears conversation history and resets the interface while storing previous chats in Supabase
+
+## User Experience
+
+### User Personas
+1. **Casual User**: Wants a simple way to interact with AI for entertainment or basic information
+2. **Content Creator**: Uses the tool to generate ideas or content for their work
+3. **Curious Explorer**: Experiments with AI capabilities for learning purposes
+
+### Key User Flows
+1. **Text Chat Flow**:
+   - User enters site → Types message → Views streaming response → Continues conversation
+   
+2. **Image Generation Flow**:
+   - User enters site → Toggles to image mode → Describes desired image → Receives generated image
+   
+3. **New Chat Flow**:
+   - User clicks "New Chat" → Previous conversation is stored → Fresh interface is presented
+
+### UI/UX Considerations
+- Clean, minimal interface with focus on content
+- Clear visual distinction between user and AI messages
+- Obvious toggle for switching between text and image modes
+- Intuitive input area with send button and clear indication of active mode
+
+## Technical Architecture
+
+### System Components
+1. **Frontend**:
+   - NextJS App Directory structure for routing and server components
+   - React components for UI elements and state management
+   - TailwindCSS for styling with ShadUI for reusable components
+   
+2. **Backend**:
+   - Supabase Edge Functions for chat functionality
+   - Supabase Database for storing chat messages
+   
+3. **External Services**:
+   - OpenAI API for GPT-4.1-nano text generation
+   - OpenAI API for gpt-image-1 image generation
+
+### Data Models
+1. **Chat Message**:
+   ```
+   {
+     id: string
+     created_at: timestamp
+     chat_id: string
+     role: 'user' | 'assistant'
+     content: string
+     type: 'text' | 'image'
+     
+     image_url?: string
+   }
+   ```
+
+2. **Chat Session**:
+   ```
+   {
+     id: string
+     created_at: timestamp
+     updated_at: timestamp
+     title: string (derived from first message)
+   }
+   ```
+
+### APIs and Integrations
+1. **OpenAI Text Generation**:
+   - Model: gpt-4.1-nano-2025-04-14
+   - Streaming format for real-time response display
+   
+2. **OpenAI Image Generation**:
+   - Model: gpt-image-1
+   - Standard request/response pattern
+   
+3. **Supabase Database**:
+   - Tables for storing chat sessions and messages
+   - SQL migrations for schema management
+   
+4. **Supabase Edge Functions**:
+   - Serverless functions to handle chat logic and API interactions
+
+### Infrastructure Requirements
+- Local Supabase instance for development
+- NextJS development server
+- Environment variables for API keys and endpoints
+
+## Development Roadmap
+
+### Phase 1: MVP Foundation
+1. Set up project structure with NextJS App Directory
+2. Implement basic UI components with TailwindCSS and ShadUI
+3. Create chat interface layout
+4. Set up Supabase local instance and database schema
+5. Implement text chat functionality with OpenAI streaming
+
+### Phase 2: Core Features
+1. Add image generation capability with mode toggle
+2. Implement message storage in Supabase
+3. Create "New Chat" functionality
+4. Enhance UI with improved styling and responsiveness
+
+### Phase 3: Refinement
+1. Optimize API usage and error handling
+2. Improve response formatting and display
+3. Add loading states and feedback mechanisms
+4. Ensure cross-browser compatibility
+
+## Logical Dependency Chain
+
+### Foundation Layer
+1. Project setup with NextJS, TailwindCSS, and ShadUI
+2. Supabase local setup with initial migrations
+3. Basic UI layout and components
+
+### Core Functionality Layer
+1. Text chat implementation with OpenAI integration
+2. Streaming response rendering
+3. Supabase database integration for message storage
+
+### Feature Expansion Layer
+1. Image generation mode with toggle
+2. New chat functionality
+
+### Refinement Layer
+1. Error handling
+2. Loading states
+3. UI polish
+
+## Risks and Mitigations
+
+### Technical Challenges
+- **Risk**: OpenAI API rate limits could affect user experience
+  **Mitigation**: Implement proper error handling and feedback for rate limit cases
+  
+- **Risk**: Stream processing might be complex to implement correctly
+  **Mitigation**: Follow OpenAI documentation examples closely and use established patterns
+
+### MVP Scoping
+- **Risk**: Feature creep could delay completion
+  **Mitigation**: Strict adherence to MVP requirements; defer additional features to future versions
+  
+- **Risk**: Integration between NextJS and Supabase might have unexpected challenges
+  **Mitigation**: Use documented examples and patterns from the provided technical documentation
+
+### Resource Constraints
+- **Risk**: Development environment setup might be time-consuming
+  **Mitigation**: Follow clear setup instructions for Supabase local instance
+  
+- **Risk**: API costs for extensive testing
+  **Mitigation**: Use smaller models during development when possible
+
+## Appendix
+
+### Technical Documentation References
+- NextJS App Directory: Refer to NextJS_AppDirectory.md
+- OpenAI Text Streaming: Follow OpenAI_StreamText.md with gpt-4.1-nano
+- OpenAI Image Generation: Use OpenAI_ImageGeneration.md with gpt-image-1
+- Supabase Edge Functions: Implement as per Supabase_EdgeFunctions.md
+- Supabase Database: Configure using Supabase_Migrations_Local.md
+
+### Future Enhancements (Not Part of MVP)
+- User authentication
+- Chat history browsing
+- Dark/light mode toggle
+- Performance optimizations
+- Keyboard shortcuts
+- Animations and transitions
+- Deployment pipeline
+- Security hardening 

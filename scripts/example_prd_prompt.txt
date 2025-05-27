@@ -50,3 +50,7 @@ Focus on MVP only. You can mention future improvements as a section but do not a
 
 #### Documentation
 Reference documentation at key steps to follow exact syntax requirements
+For each task, ensure that the appropriate software is installed and configured, e.g.,
+- Supabase CLI is installed
+- Docker is installed successfully
+- NextJS (requires NodeJS)
