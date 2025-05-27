@@ -11,8 +11,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/dompurify": "^3.0.5",
-    "dompurify": "^3.2.6",
     "task-master-ai": "^0.12.1"
   }
 }
