@@ -2,8 +2,11 @@
 
 # Course Assets / Contact Me
 [Course Notes](https://shawnesquivel.notion.site/Cursor-Vibe-Coding-Bootcamp-1d123536d7d5800a9682e4f76ca09df2)
+
 [Discord](https://discord.gg/tVAPZfKk8Z)
+
 My Email: shawnesquivel24@gmail.com
+
 My Linkedin: https://www.linkedin.com/in/shawnesquivel
 
 ## Udemy Course
