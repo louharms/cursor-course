@@ -1,0 +1,8 @@
+# Generate `DESIGN_PROFLILE.json` from a set of screenshots/images
+
+1. Analyze the screenshots – what makes the design unique? Explain the design verbosely in simple and concise design terminology.
+2. Take the design and extract the visual data into a JSON
+3. Create a JSON profile design system that extracts visual data from these screenshots so that i can use the JSON output in my AI Coding Agent. 
+  a) Include style, aesthetic, fonts, typography, colors, etc. 
+  b) Remove text specific to the image.
+4. Give specific context such that an LLM can easily replicate the design systems in a consistent style.
