@@ -1,0 +1,29 @@
+# What we're doing
+
+We're going to build a landing page for our application.
+
+# Context
+FRONTEND:
+
+BACKEND:
+
+DATABASE:
+
+# Follow this exact workflow. State "**Step X:**" and current action for tracking progress!
+
+1. Read the PRD spec to gain as MUCH context as you need to understand the problem fully. Generate a full report on the codebase context before starting.
+2. We have DESIGN.JSON for the how to implement the design. Analyze it and
+3. Only use TailwindCSS. Use Globals.CSS ONLY  if absolutely necessary.
+4. Save mobile responsive design for final pass check.
+5. Use `npm run typecheck` to lint every time you edit the frontend.
+6. Make a plan.
+   a) Check if there are previous components already in the system before making new ones.
+   b) Use the libraries included in @package.json and nothing else.
+   c) Reference Figma designs if provided, or sketch basic UIs for visual context.
+   d) Ask clarificaiton questions, and make assumptions given the information you currently have.
+7. Start Coding.
+8. Post Coding: Checks
+9. Test accessibility: color contrast (WCAG AA), alt text, keyboard navigation, semantic HTML.
+10. Cross reference DESIGN.json - does the code follow the rules?
+11. Run `npm run typecheck` a final time. Any issues?
+12. Summarize all the major decisions made, any issues you couldn't solve, as a short report.
