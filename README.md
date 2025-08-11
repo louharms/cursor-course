@@ -36,10 +36,17 @@ https://github.com/user-attachments/assets/2c2ada4e-c7ed-4176-be20-0afd63ea9b98
 ## Project Setup
 1. Fork the course repository on GitHub [here](0https://github.com/shawnesquivel/cursor-course) 
 
-2. Clone the repository
+<img width="1276" height="344" alt="image" src="https://github.com/user-attachments/assets/c4ad6f1d-60bd-4114-a413-d5964fb7d8b2" />
+
+
+<img width="826" height="537" alt="image" src="https://github.com/user-attachments/assets/3bbad450-1a3f-4c71-85e1-5d599d3fe8b3" />
+
+
+
+2. Clone your forked repository
 
 ```
-git clone https://github.com/shawnesquivel/cursor-course.git
+git clone FORKED_REPO_HTTPS_URL
 ```
 
 1. Populate ANTHROPIC_API_KEY and OPENAI_API_KEY.
