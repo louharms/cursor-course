@@ -39,7 +39,7 @@ https://github.com/user-attachments/assets/2c2ada4e-c7ed-4176-be20-0afd63ea9b98
 2. Clone the repository
 
 ```
-git clone HTTPS_URL
+git clone https://github.com/shawnesquivel/cursor-course.git
 ```
 
 1. Populate ANTHROPIC_API_KEY and OPENAI_API_KEY.
