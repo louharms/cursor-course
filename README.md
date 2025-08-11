@@ -45,6 +45,8 @@ https://github.com/user-attachments/assets/2c2ada4e-c7ed-4176-be20-0afd63ea9b98
 
 2. Clone your forked repository
 
+<img width="505" height="412" alt="image" src="https://github.com/user-attachments/assets/436674be-1de1-4b3e-808d-e1accc4b8f65" />
+
 ```
 git clone FORKED_REPO_HTTPS_URL
 ```
