@@ -1,4 +1,5 @@
 # Vibe Coding with Cursor Course
+Luke Hahn git commit test
 
 # Course Assets / Contact Me
 [Course Notes](https://shawnesquivel.notion.site/Cursor-Vibe-Coding-Bootcamp-1d123536d7d5800a9682e4f76ca09df2)
