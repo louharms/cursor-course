@@ -1,5 +1,5 @@
 ---
-description: 
+description: Comprehensive workflow for creating, testing, and debugging Supabase Edge Functions with local development and troubleshooting guidance
 globs: supabase/functions/**/*.ts
 alwaysApply: false
 ---

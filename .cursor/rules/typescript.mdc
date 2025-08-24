@@ -1,0 +1,4 @@
+---
+globs: *tsx,*ts
+alwaysApply: false
+---

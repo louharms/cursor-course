@@ -27,6 +27,9 @@ yarn-error.log*
 .env*.local
 .env
 
+# mcp.json
+mcp.json
+
 # vercel
 .vercel
 
@@ -48,13 +51,18 @@ dev-debug.log
 *.sln
 *.sw?
 
-# Task files
-tasks.json
-tasks/
-
 # Temporary and branch folders
 .branches/
 .temp/
 # Supabase specific
 supabase/.branches/
 supabase/.temp/
+
+# Dependency directories
+node_modules/
+# Environment variables
+# OS specific
+
+# Task files
+# tasks.json
+# tasks/ 

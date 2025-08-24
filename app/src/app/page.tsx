@@ -1,51 +1,206 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+
+interface Message {
+  id: string;
+  content: string;
+  role: 'user' | 'assistant';
+  type: 'text' | 'image';
+  imageUrl?: string;
+}
 
 export default function ChatDemoPage() {
   const [mode, setMode] = useState<'text' | 'image'>('text');
-  const [messages, setMessages] = useState<Array<{
-    id: string;
-    content: string;
-    role: 'user' | 'assistant';
-    type: 'text' | 'image';
-  }>>([
-    {
-      id: '1',
-      content: 'Hello! Can you help me understand how React hooks work?',
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Generate unique message ID with counter to prevent duplicates
+  const messageIdCounter = useRef(0);
+  const generateMessageId = () => {
+    messageIdCounter.current += 1;
+    return `${Date.now()}-${messageIdCounter.current}`;
+  };
+
+  // Handle sending text messages with streaming
+  const handleSendTextMessage = async (message: string) => {
+    if (!message.trim() || isLoading) return;
+
+    setIsLoading(true);
+    
+    // Add user message
+    const userMessage: Message = {
+      id: generateMessageId(),
+      content: message,
       role: 'user',
       type: 'text'
-    },
-    {
-      id: '2',
-      content: 'Of course! React hooks are functions that let you use state and other React features in functional components. The most common ones are useState for managing state and useEffect for side effects. Would you like me to explain a specific hook or show you an example?',
+    };
+    setMessages(prev => [...prev, userMessage]);
+
+    // Create assistant message placeholder
+    const assistantMessageId = generateMessageId();
+    const assistantMessage: Message = {
+      id: assistantMessageId,
+      content: '',
       role: 'assistant',
       type: 'text'
-    },
-    {
-      id: '3',
-      content: 'That\'s helpful! Can you show me a simple useState example?',
+    };
+    setMessages(prev => [...prev, assistantMessage]);
+
+    try {
+      // Use fetch with ReadableStream for streaming
+      const response = await fetch('http://127.0.0.1:54321/functions/v1/chat-text', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+
+      if (!reader) {
+        throw new Error('No response body reader available');
+      }
+
+      let buffer = '';
+      
+      while (true) {
+        const { done, value } = await reader.read();
+        
+        if (done) {
+          setIsLoading(false);
+          break;
+        }
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || ''; // Keep incomplete line in buffer
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6); // Remove 'data: ' prefix
+            
+            if (data === '[DONE]') {
+              setIsLoading(false);
+              reader.cancel();
+              return;
+            }
+
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.content) {
+                setMessages(prev => prev.map(msg => 
+                  msg.id === assistantMessageId 
+                    ? { ...msg, content: msg.content + parsed.content }
+                    : msg
+                ));
+              }
+              if (parsed.error) {
+                throw new Error(parsed.error);
+              }
+            } catch (parseError) {
+              console.error('Error parsing stream data:', parseError);
+            }
+          }
+        }
+      }
+
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setMessages(prev => prev.map(msg => 
+        msg.id === assistantMessageId 
+          ? { ...msg, content: '[Error: Failed to send message. Please try again.]' }
+          : msg
+      ));
+      setIsLoading(false);
+    }
+  };
+
+  // Handle sending image generation requests
+  const handleSendImageMessage = async (prompt: string) => {
+    if (!prompt.trim() || isLoading) return;
+
+    setIsLoading(true);
+    
+    // Add user message
+    const userMessage: Message = {
+      id: generateMessageId(),
+      content: prompt,
       role: 'user',
       type: 'text'
-    },
-    {
-      id: '4',
-      content: 'Absolutely! Here\'s a simple counter example:\n\n```jsx\nimport React, { useState } from \'react\';\n\nfunction Counter() {\n  const [count, setCount] = useState(0);\n\n  return (\n    <div>\n      <p>You clicked {count} times</p>\n      <button onClick={() => setCount(count + 1)}>\n        Click me\n      </button>\n    </div>\n  );\n}\n```\n\nThe useState hook returns an array with two elements: the current state value and a function to update it.',
-      role: 'assistant',
-      type: 'text'
-    },
-    {
-      id: '5',
-      content: 'Perfect! Now can you create an image of a cute cat coding on a laptop?',
-      role: 'user',
-      type: 'text'
-    },
-    {
-      id: '6',
-      content: 'I\'d be happy to generate that image for you! Here\'s a cute cat coding on a laptop:',
+    };
+    setMessages(prev => [...prev, userMessage]);
+
+    // Create assistant message placeholder
+    const assistantMessageId = generateMessageId();
+    const assistantMessage: Message = {
+      id: assistantMessageId,
+      content: 'Generating image...',
       role: 'assistant',
       type: 'image'
+    };
+    setMessages(prev => [...prev, assistantMessage]);
+
+    try {
+      const response = await fetch('http://127.0.0.1:54321/functions/v1/chat-image', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ prompt })
+      });
+
+      const data = await response.json();
+      
+      if (data.success && data.imageUrl) {
+        setMessages(prev => prev.map(msg => 
+          msg.id === assistantMessageId 
+            ? { ...msg, content: `Generated image: ${prompt}`, imageUrl: data.imageUrl }
+            : msg
+        ));
+      } else {
+        throw new Error(data.error || 'Failed to generate image');
+      }
+    } catch (error) {
+      console.error('Error generating image:', error);
+      setMessages(prev => prev.map(msg => 
+        msg.id === assistantMessageId 
+          ? { ...msg, content: `[Error: ${error instanceof Error ? error.message : 'Failed to generate image'}]` }
+          : msg
+      ));
     }
-  ]);
+    
+    setIsLoading(false);
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+
+    const message = input.trim();
+    setInput('');
+    
+    // Reset textarea height
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
+
+    if (mode === 'text') {
+      await handleSendTextMessage(message);
+    } else {
+      await handleSendImageMessage(message);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -106,7 +261,18 @@ export default function ChatDemoPage() {
                         : 'bg-white border border-gray-600 text-gray-800'
                     }`}
                   >
-                    {message.content}
+                    {message.type === 'image' && message.imageUrl ? (
+                      <div>
+                        <p className="mb-2">{message.content}</p>
+                        <img 
+                          src={message.imageUrl} 
+                          alt="Generated image" 
+                          className="rounded-lg max-w-full h-auto"
+                        />
+                      </div>
+                    ) : (
+                      <div className="whitespace-pre-wrap">{message.content}</div>
+                    )}
                   </div>
                 </div>
               ))
@@ -118,22 +284,33 @@ export default function ChatDemoPage() {
       {/* Input Area - ChatGPT Style */}
       <div className="bg-white p-4">
         <div className="max-w-4xl mx-auto">
-          <div className="relative rounded-3xl border border-gray-300 bg-white focus-within:border-gray-400">
-            {/* Textarea */}
-            <textarea
-              placeholder={mode === 'text' ? 'Message ChatGPT' : 'Describe the image you want to generate...'}
-              className="w-full resize-none bg-transparent px-4 pt-3 pb-2 text-gray-900 placeholder-gray-500 focus:outline-none min-h-[44px] max-h-32 overflow-y-auto"
-              rows={1}
-              style={{
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-              }}
-              onInput={(e) => {
-                const target = e.target as HTMLTextAreaElement;
-                target.style.height = 'auto';
-                target.style.height = Math.min(target.scrollHeight, 128) + 'px';
-              }}
-            />
+          <form onSubmit={handleSubmit}>
+            <div className="relative rounded-3xl border border-gray-300 bg-white focus-within:border-gray-400">
+              {/* Textarea */}
+              <textarea
+                ref={textareaRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={mode === 'text' ? 'Message ChatGPT' : 'Describe the image you want to generate...'}
+                className="w-full resize-none bg-transparent px-4 pt-3 pb-2 text-gray-900 placeholder-gray-500 focus:outline-none min-h-[44px] max-h-32 overflow-y-auto"
+                rows={1}
+                disabled={isLoading}
+                style={{
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                }}
+                onInput={(e) => {
+                  const target = e.target as HTMLTextAreaElement;
+                  target.style.height = 'auto';
+                  target.style.height = Math.min(target.scrollHeight, 128) + 'px';
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmit(e);
+                  }
+                }}
+              />
             
             {/* Controls Row */}
             <div className="flex items-center justify-between px-3 pb-2">
@@ -162,23 +339,36 @@ export default function ChatDemoPage() {
               </div>
 
               {/* Send Button - Right Side */}
-              <button className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-gray-400 hover:bg-gray-600 hover:text-white transition-colors">
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                  />
-                </svg>
+              <button 
+                type="submit"
+                disabled={isLoading || !input.trim()}
+                className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
+                  isLoading || !input.trim()
+                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-600 text-white hover:bg-gray-700'
+                }`}
+              >
+                {isLoading ? (
+                  <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                ) : (
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                    />
+                  </svg>
+                )}
               </button>
             </div>
           </div>
+          </form>
           
           {/* Bottom text like ChatGPT */}
           <div className="mt-2 text-center">
